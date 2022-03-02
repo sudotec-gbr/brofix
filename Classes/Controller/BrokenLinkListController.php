@@ -312,11 +312,14 @@ class BrokenLinkListController extends AbstractInfoController
         $this->filter = new BrokenLinkListFilter();
         $this->filter->setUidFilter(GeneralUtility::_GP('uid_searchFilter') ?? '');
         $this->filter->setUrlFilter(GeneralUtility::_GP('url_searchFilter') ?? '');
+        $this->filter->setErrorcodeFilter(GeneralUtility::_GP('errorcode_searchFilter') ?? '');
         $this->filter->setLinktypeFilter(GeneralUtility::_GP('linktype_searchFilter') ?? 'all');
         $this->filter->setTitleFilter(GeneralUtility::_GP('title_searchFilter') ?? '');
 
         // to prevent deleting session, when user sort the records
-        if (!is_null(GeneralUtility::_GP('url_searchFilter')) || !is_null(GeneralUtility::_GP('title_searchFilter')) || !is_null(GeneralUtility::_GP('uid_searchFilter'))) {
+        if (!is_null(GeneralUtility::_GP('url_searchFilter')) || !is_null(GeneralUtility::_GP('title_searchFilter'))
+            || !is_null(GeneralUtility::_GP('uid_searchFilter'))     || !is_null(GeneralUtility::_GP('errorcode_searchFilter'))
+        ) {
             $this->backendSession->store('filterKey', $this->filter);
         }
 
@@ -562,6 +565,7 @@ class BrokenLinkListController extends AbstractInfoController
             $searchFilter->setUrlFilter($this->backendSession->get('filterKey')->getUrlFilter());
             $searchFilter->setLinktypeFilter($this->backendSession->get('filterKey')->getLinktypeFilter());
             $searchFilter->setUidFilter($this->backendSession->get('filterKey')->getUidFilter());
+            $searchFilter->setErrorcodeFilter($this->backendSession->get('filterKey')->getErrorcodeFilter());
             $searchFilter->setTitleFilter($this->backendSession->get('filterKey')->getTitleFilter());
 
             $brokenLinks = $this->brokenLinkRepository->getBrokenLinks(
@@ -591,6 +595,7 @@ class BrokenLinkListController extends AbstractInfoController
         $this->view->assign('uid_filter', $this->backendSession->get('filterKey')->getUidFilter());
         $this->view->assign('linktype_filter', $this->backendSession->get('filterKey')->getLinktypeFilter());
         $this->view->assign('url_filter', $this->backendSession->get('filterKey')->getUrlFilter());
+        $this->view->assign('errorcode_filter', $this->backendSession->get('filterKey')->getErrorcodeFilter());
         $this->view->assign('view_mode', $this->viewMode ?: 'view_table_min');
         if ($this->id === 0) {
             $this->createFlashMessagesForRootPage();
@@ -882,13 +887,14 @@ class BrokenLinkListController extends AbstractInfoController
                 nl2br(
                 // Encode for output
                     htmlspecialchars(
-                        $hookObj->getErrorMessage($errorParams),
+                        $hookObj->getErrorMessage($errorParams) . ' [' . $hookObj->getErrorShortcut($errorParams) . ']',
                         ENT_QUOTES,
                         'UTF-8',
                         false
                     )
                 )
             );
+
         }
         $variables['linkmessage'] = $linkMessage;
 

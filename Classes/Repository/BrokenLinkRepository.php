@@ -125,6 +125,27 @@ class BrokenLinkRepository implements LoggerAwareInterface
                 );
             }
 
+            $errorcode = $filter->getErrorcodeFilter();
+            if ($errorcode) {
+                $errorCodes = explode('_', $errorcode);
+                if ($errorCodes[0]) {
+                    $queryBuilder->andWhere(
+                        $queryBuilder->expr()->like(self::TABLE . '.url_response',
+                            $queryBuilder->createNamedParameter('%' . $queryBuilder->escapeLikeWildcards('"errorType":"' . $errorCodes[0] . '",') . '%')
+                        )
+                    );
+                }
+
+                if ($errorCodes[1]) {
+                    $queryBuilder->andWhere(
+                        $queryBuilder->expr()->like(self::TABLE . '.url_response',
+                            $queryBuilder->createNamedParameter('%' . $queryBuilder->escapeLikeWildcards('"errno":' . $errorCodes[1] . ',') . '%')
+                        )
+                    );
+                }
+
+            }
+
             if ($orderBy !== []) {
                 $values = array_shift($orderBy);
                 if ($values && is_array($values) && count($values) === 2) {

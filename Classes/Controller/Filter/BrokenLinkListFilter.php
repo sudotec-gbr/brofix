@@ -21,6 +21,11 @@ class BrokenLinkListFilter
 
     /**
      * @var string
+     */
+    protected $errorcode_filter = '';
+
+    /**
+     * @var string
      * @deprecated
      */
     protected $title_filter = '';
@@ -53,6 +58,22 @@ class BrokenLinkListFilter
     public function setUrlFilter(string $url_filter): void
     {
         $this->url_filtre = $url_filter;
+    }
+
+    /**
+     * @return string
+     */
+    public function getErrorcodeFilter(): string
+    {
+        return $this->errorcode_filter;
+    }
+
+    /**
+     * @param string $errorcode_filter
+     */
+    public function setErrorcodeFilter(string $errorcode_filter): void
+    {
+        $this->errorcode_filter = $errorcode_filter;
     }
 
     /** @deprecated */
